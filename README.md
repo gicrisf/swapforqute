@@ -93,5 +93,8 @@ I could use the extra time to add more features!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V425BFU)
 
+<script src="https://liberapay.com/gicrisf/widgets/button.js"></script>
+<noscript><a href="https://liberapay.com/gicrisf/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+
 ## License
 [MIT](https://github.com/gicrisf/swapforqute/blob/main/LICENSE)
