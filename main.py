@@ -11,39 +11,42 @@ parser = argparse.ArgumentParser(
                     epilog = '...')
 
 parser.add_argument('-u', '--url', help='URL that must be checked and maybe changed')
+# replace that "open -t"
+# parser.add_argument('--qute-cmd', help="Write Qutebrowser's command")
 parser.add_argument('-c', '--conf', help='Path of the JSON configuration')
 
 def replace(url, conf):
-    parsed = urlparse(url)
+    out_url = urlparse(url)
 
-    with open(conf, "r") as read_file:
-        conf = json.load(read_file)
+    # Read JSON configuration
+    with open(conf, "r") as f:
+        conf = json.load(f)
 
-    out_url = parsed
+    # Replace URL components
+    for nl_hypoth, instruct in conf.items():
+        if out_url.netloc == nl_hypoth:
+            # Replace http scheme
+            if 'force_https' in instruct:
+                if instruct['force_https']:
+                    out_url = out_url._replace(scheme='https')
 
-    for hypoth, instruct in conf.items():
-        # Scheme
-        if 'force_https' in instruct:
-            if instruct['force_https']:
-                out_url = parsed._replace(scheme='https')
+            # Replace netloc
+            if 'out' in instruct:
+                out_url = out_url._replace(netloc=instruct['out'])
 
-        # Netloc
-        if 'out' in instruct:
-            out_url = parsed._replace(netloc=instruct['out'])
+            # Delete queries
+            if 'clean_queries' in instruct:
+                if instruct['clean_queries']:
+                    out_url = out_url._replace(query='')
 
-        # Queries
-        if 'clean_queries' in instruct:
-            if instruct['clean_queries']:
-                out_url = parsed._replace(query='')
-
-        # Frags
-        if 'clean_fragments' in instruct:
-            if instruct['clean_fragments']:
-                out_url = parsed._replace(fragment='')
+            # Delete frags
+            if 'clean_fragments' in instruct:
+                if instruct['clean_fragments']:
+                    out_url = out_url._replace(fragment='')
 
     return(out_url.geturl())
 
 if __name__ == "__main__":
     args = parser.parse_args()
     with open(os.environ["QUTE_FIFO"], "a") as o_fifo:
-        o_fifo.write("open -t " + replace(args.url, args.conf))
+        o_fifo.write("open -t {}".format(replace(args.url, args.conf)))
