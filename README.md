@@ -2,7 +2,7 @@
 
 > Redirect and clean URLs in qutebrowser.
 
-SwapForQute (from now just SFQ) is an userscript for qutebrowser that replaces your URLs with new ones following an easy to set configuration.
+SwapForQute (or just SFQ) is an userscript for qutebrowser that replaces your URLs with new ones following an easy to set configuration.
 
 See, as an example, this JSON snippet:
 
@@ -69,19 +69,29 @@ The obvious next step is setting up the keybindings.
 config.bind('o', ':sfq')
 ```
 
-Personally, I prefer leaving the default command for `o` key and assign `:sfq` to a special sequence, for `f` (hint links) and something else. [Check my qutebrowser literate configuration](https://github.com/gicrisf/qute-config) for a more extended explanation of command building, keybindings and other tricks.
+Personally, I prefer leaving the default command for `o` key and assign `:sfq` to a special sequence, for `f` (hint links) and something else. [Check my qutebrowser literate configuration](https://github.com/gicrisf/qute-config) for a more extended explanation of command building, keybindings and other tricks. 
+
+Of course, you can be creative and came up with your own solutions: the script just process your input to give you an output, but it's up to you where and when to use it.
 
 ## Why I wrote this
 I avoid running javascript on my browser for a lot of reasons: security, minimizing CPU usage, minimizing tracking... But some sites, usually big ones, heavily relies on JS for rendering content. When possible, I wished I could stay on privacy-friendly and js-free alternative frontends. Classic examples are offered by old reddit frontend VS new reddit frontend, nitter VS twitter, invidious VS youtube. With this script, it's possible to easily achieve all those redirects and every other you happen to think of.
 
-<!-- # How it works -->
+## How it works
+
+![diagram](diagram.png)
 
 ## Alternative ways
 Before writing this script, I stepped on another userscript that aims at a similar goal, which is [Qutebrowser URL Mutator](https://codeberg.org/mister_monster/qutebrowser-url-mutator); it's thought to be configured via regexes, just like [Firefox "Redirector" extension](https://github.com/einaregilsson/Redirector). If you're used to this kind of workflow or you simply find it attractive, I suggest you to take a look at it.
-Mutator was of inspiration for SFQ, so thanks to the author for its work!
+Mutator was of inspiration for SFQ, so thanks for that!
 
 ## Requirements
 A Python 3.7 (or newer) installation is required to run the script. It depends on standard libraries only (os, json, urllib, argparse). Obviously, being this an userscript for qutebrowser, [Qutebrowser](https://github.com/qutebrowser/qutebrowser) is required too.
+
+## Support
+Why don't you help me keeping myself awake buying me a coffee?
+I could use the extra time to add more features!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V425BFU)
 
 ## License
 [MIT](https://github.com/gicrisf/swapforqute/blob/main/LICENSE)
