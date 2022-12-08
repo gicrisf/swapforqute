@@ -44,6 +44,33 @@ vi ~/.config/qutebrowser/userscripts/swapforqute/config.json
 
 It's all ready! Now set the keybindings in qutebrowser in compliance with your needs.
 
+## Alias and keybindings
+It's not feasible to write all the command's clutter everytime.
+Better writing a simple alias like `:sfq` in `config.py`:
+
+``` python
+# Build the command
+sfq_base_dir = <where-you-cloned-the-repo>
+sfq_script_path = sfq_base_dir + "main.py"
+sfq_conf_path = sfq_base_dir + "config.json"
+sfq_cmd = "--userscript {} -c {}".format(sfq_script_path, sfq_conf_path)
+
+# Assign the alias
+c.aliases['sfq'] = "set-cmd-text -s :spawn {} -u ".format(sfq_cmd)
+```
+
+The obvious next step is setting up the keybindings.
+
+``` python
+# The following are equivalent!
+# We can bind to an alias or directly to the command.
+
+# config.bind('o', "set-cmd-text -s :spawn {} -u ".format(sfq_cmd))
+config.bind('o', ':sfq')
+```
+
+Personally, I prefer leaving the default command for `o` key and assign `:sfq` to a special sequence, for `f` (hint links) and something else. [Check my qutebrowser literate configuration](https://github.com/gicrisf/qute-config) for a more extended explanation of command building, keybindings and other tricks.
+
 ## Why I wrote this
 I avoid running javascript on my browser for a lot of reasons: security, minimizing CPU usage, minimizing tracking... But some sites, usually big ones, heavily relies on JS for rendering content. When possible, I wished I could stay on privacy-friendly and js-free alternative frontends. Classic examples are offered by old reddit frontend VS new reddit frontend, nitter VS twitter, invidious VS youtube. With this script, it's possible to easily achieve all those redirects and every other you happen to think of.
 
