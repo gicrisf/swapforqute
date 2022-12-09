@@ -4,7 +4,9 @@
 
 SwapForQute (or just SFQ) is an userscript for qutebrowser that replaces your URLs with new ones following an easy to set configuration.
 
-See, as an example, this JSON snippet:
+![diagram](what_it_does.png)
+
+The diagram up here show, as an example, what would happen with this JSON snippet:
 
 ```json
 {
@@ -22,6 +24,7 @@ See, as an example, this JSON snippet:
 ```
 
 When you bounce on a `www.reddit.com` or `reddit.com` URL, the script automatically tells the browser to search for the corresponding `old.reddit.com` one. As you can see, you can force HTTPS and clean queries, so that all tracking garbage is wiped out in the process.
+Therefore, something like "https://www.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs/?utm_source=share&utm_medium=web2x&context=3" magically become "https://old.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs".
 
 # Installation and usage
 Copy the script under your userscript directory:
@@ -78,7 +81,7 @@ I avoid running javascript on my browser for a lot of reasons: security, minimiz
 
 ## How it works
 
-![diagram](diagram.png)
+![diagram](how_it_works.png)
 
 ## Alternative ways
 Before writing this script, I stepped on another userscript that aims at a similar goal, which is [Qutebrowser URL Mutator](https://codeberg.org/mister_monster/qutebrowser-url-mutator); it's thought to be configured via regexes, just like [Firefox "Redirector" extension](https://github.com/einaregilsson/Redirector). If you're used to this kind of workflow or you simply find it attractive, I suggest you to take a look at it.
@@ -93,8 +96,7 @@ I could use the extra time to add more features!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V425BFU)
 
-<script src="https://liberapay.com/gicrisf/widgets/button.js"></script>
-<noscript><a href="https://liberapay.com/gicrisf/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+<a href="https://liberapay.com/gicrisf/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
 
 ## License
 [MIT](https://github.com/gicrisf/swapforqute/blob/main/LICENSE)
