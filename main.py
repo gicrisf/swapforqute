@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from urllib.parse import urlparse
+from os.path import expanduser
 import argparse
 import os
 import json
@@ -19,7 +20,7 @@ def replace(url, conf):
     out_url = urlparse(url)
 
     # Read JSON configuration
-    with open(conf, "r") as f:
+    with open(expanduser(conf), "r") as f:
         conf = json.load(f)
 
     # Replace URL components
