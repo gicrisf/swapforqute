@@ -39,13 +39,21 @@ Give it the permissions to work on your system:
 chmod +x ~/.config/qutebrowser/userscripts/swapforqute/main.py
 ```
 
-Now, edit the configuration as you please:
+In the end, you should edit the configuration as you please:
 
 ``` sh
 vi ~/.config/qutebrowser/userscripts/swapforqute/config.json
 ```
 
-It's all ready! Now set the keybindings in qutebrowser in compliance with your needs.
+For each item, you can set how/if:
+- Replace netloc (with what? Set `out`)
+- Force HTTPS (yes/no? Set `force_https`)
+- Delete queries (yes/no? Set `clean_queries`)
+- Delete fragments (yes/no? Set `clean_fragments`)
+
+Every element is optional. You can choose to force https requests without touching the other components of the URL or cleaning the fragments without touching the queries.
+
+It's all ready! Set the aliases/keybindings and you're good to go.
 
 ## Alias and keybindings
 It's not feasible to write all the command's clutter everytime.
@@ -53,13 +61,13 @@ Better writing a simple alias like `:sfq` in `config.py`:
 
 ``` python
 # Build the command
-sfq_base_dir = <where-you-cloned-the-repo>
+sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
 sfq_script_path = sfq_base_dir + "main.py"
 sfq_conf_path = sfq_base_dir + "config.json"
 sfq_cmd = "--userscript {} -c {}".format(sfq_script_path, sfq_conf_path)
 
 # Assign the alias
-c.aliases['sfq'] = "set-cmd-text -s :spawn {} -u ".format(sfq_cmd)
+c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
 ```
 
 The obvious next step is setting up the keybindings.
@@ -68,7 +76,7 @@ The obvious next step is setting up the keybindings.
 # The following are equivalent!
 # We can bind to an alias or directly to the command.
 
-# config.bind('o', "set-cmd-text -s :spawn {} -u ".format(sfq_cmd))
+# config.bind('o', "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd))
 config.bind('o', ':sfq')
 ```
 
