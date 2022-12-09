@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-
-from urllib.parse import urlparse
-from os.path import expanduser
-import argparse
+#
 import os
 import json
+import argparse
+from urllib.parse import urlparse
+from os.path import expanduser
 
 parser = argparse.ArgumentParser(
                     prog = 'swapforqute',
@@ -12,8 +12,7 @@ parser = argparse.ArgumentParser(
                     epilog = '...')
 
 parser.add_argument('-u', '--url', help='URL that must be checked and maybe changed')
-# replace that "open -t"
-# parser.add_argument('--qute-cmd', help="Write Qutebrowser's command")
+parser.add_argument('--cmd', help="Write Qutebrowser's command")
 parser.add_argument('-c', '--conf', help='Path of the JSON configuration')
 
 def replace(url, conf):
@@ -50,4 +49,4 @@ def replace(url, conf):
 if __name__ == "__main__":
     args = parser.parse_args()
     with open(os.environ["QUTE_FIFO"], "a") as o_fifo:
-        o_fifo.write("open -t {}".format(replace(args.url, args.conf)))
+        o_fifo.write("{cmd} {url}".format(cmd=args.cmd, url=replace(args.url, args.conf)))
