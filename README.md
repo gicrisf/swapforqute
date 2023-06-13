@@ -30,7 +30,7 @@ Therefore, something like "https://www.reddit.com/r/emacs/comments/yubhff/zwitte
 Copy the script under your userscript directory:
 
 ``` sh
-git clone --depth 1 https://github.com/gicrisf/swapforqute ~/.config/qutebrowser/userscripts
+git clone --depth 1 https://github.com/gicrisf/swapforqute ~/.config/qutebrowser/userscripts/swapforqute
 ```
 
 Give it the permissions to work on your system:
