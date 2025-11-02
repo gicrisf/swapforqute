@@ -4,9 +4,21 @@
 
 SwapForQute (or just SFQ) is an userscript for qutebrowser that replaces your URLs with new ones following an easy to set configuration.
 
-![diagram](what_it_does.png)
+```mermaid
+graph TD
+      Q[Qutebrowser] --> OLD["OLD URL:<br/>reddit.com/.../?utm_source=..."]
+      OLD --> U[SFQ userscript]
+      U --> NEW["NEW URL:<br/>old.reddit.com/..."]
+      NEW --> Q
 
-The diagram up here show, as an example, what would happen with this configuration in the RULES dictionary:
+      classDef oldStyle fill:#ffcccc,stroke:#ff0000,color:#000
+      classDef newStyle fill:#ccffcc,stroke:#00ff00,color:#000
+
+      class OLD oldStyle
+      class NEW newStyle
+```
+
+The diagram up here shows, as an example, what would happen with this configuration in the RULES dictionary:
 
 ```python
 RULES = {
@@ -26,31 +38,60 @@ RULES = {
 When you bounce on a `www.reddit.com` or `reddit.com` URL, the script automatically tells the browser to search for the corresponding `old.reddit.com` one. As you can see, you can force HTTPS and clean queries, so that all tracking garbage is wiped out in the process.
 Therefore, something like "https://www.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs/?utm_source=share&utm_medium=web2x&context=3" magically become "https://old.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs".
 
-# Quickstart
+## Quickstart
 
-## Linux / macOS
+### Linux / macOS
 
-Use the installation script:
+**1. Install the script:**
 
 ``` sh
 curl -fsSL https://raw.githubusercontent.com/gicrisf/swapforqute/main/install.sh | bash
 ```
 
-## Windows
+**2. Add to your qutebrowser `config.py`:**
 
-Use the PowerShell installation script:
+``` python
+sfq_script_path = "~/.config/qutebrowser/userscripts/sfq.py"
+sfq_cmd = "--userscript {}".format(sfq_script_path)
+c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
+config.bind('o', ':sfq')  # Bind to your preferred key
+```
+
+**3. Customize rules in `~/.config/qutebrowser/userscripts/sfq.py`:**
+
+Edit the `RULES` dictionary to add your own URL transformations. See [Configuration](#configuration) for details.
+
+### Windows
+
+**1. Install the script:**
 
 ``` powershell
 irm https://raw.githubusercontent.com/gicrisf/swapforqute/main/install.ps1 | iex
 ```
 
-# Manual Installation
+**2. Add to your qutebrowser `config.py`:**
+
+``` python
+import os
+# N.B. We need to call the batch wrapper on Windows!
+# Don't worry, nothing else change, just watch out you don't copypaste from a linux configuration directly
+sfq_script_path = os.path.join(os.getenv('APPDATA'), 'qutebrowser', 'userscripts', 'sfq.bat')
+sfq_cmd = "--userscript {}".format(sfq_script_path)
+c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
+config.bind('o', ':sfq')  # Bind to your preferred key
+```
+
+**3. Customize rules in `%APPDATA%\qutebrowser\userscripts\sfq.py`:**
+
+Edit the `RULES` dictionary to add your own URL transformations. See [Configuration](#configuration) for details.
+
+## Manual Installation
 
 If you prefer to install manually or want more control over the process:
 
-## Linux / macOS
+### Linux / macOS
 
-``` sh
+```sh
 # Create the userscripts directory if it doesn't exist
 mkdir -p ~/.config/qutebrowser/userscripts
 
@@ -62,7 +103,7 @@ curl -L -o ~/.config/qutebrowser/userscripts/sfq.py \
 chmod +x ~/.config/qutebrowser/userscripts/sfq.py
 ```
 
-## Windows
+### Windows
 
 ``` powershell
 # Create the userscripts directory if it doesn't exist
@@ -82,11 +123,34 @@ python "%SCRIPT_DIR%sfq.py" %*
 Set-Content -Path "$InstallDir\sfq.bat" -Value $BatchContent
 ```
 
+### Setup aliases and keybindings
+
+It's not feasible to write all the command's clutter everytime.
+Better writing a simple alias like `:sfq` in `config.py`:
+
+``` python
+# Linux/macOS
+sfq_script_path = "~/.config/qutebrowser/userscripts/sfq.py"
+
+# Windows (use sfq.bat)
+# import os
+# sfq_script_path = os.path.join(os.getenv('APPDATA'), 'qutebrowser', 'userscripts', 'sfq.bat')
+
+sfq_cmd = "--userscript {}".format(sfq_script_path)
+c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
+```
+
+The obvious next step is setting up the keybindings:
+
+``` python
+config.bind('o', ':sfq')
+```
+
 ## Configuration
 
 SwapForQute supports two configuration approaches:
 
-### 1. Built-in Rules (Recommended)
+### 1. Built-in Rules (Easier)
 
 Edit the `RULES` dictionary directly in `sfq.py` (lines 16-27). This is the simplest approach and requires no additional command-line arguments:
 
@@ -134,24 +198,7 @@ For each domain, you can set:
 
 Every element is optional. You can choose to force https requests without touching the other components of the URL or cleaning the fragments without touching the queries.
 
-It's all ready! Set the aliases/keybindings and you're good to go.
-
-## Alias and keybindings
-It's not feasible to write all the command's clutter everytime.
-Better writing a simple alias like `:sfq` in `config.py`:
-
-### Using Built-in Rules Only
-
-``` python
-# Build the command (no -c flag needed)
-sfq_script_path = "~/.config/qutebrowser/userscripts/sfq.py"
-sfq_cmd = "--userscript {}".format(sfq_script_path)
-
-# Assign the alias
-c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
-```
-
-### Using Built-in Rules + JSON Extension
+### Using JSON Config with the `-c` Flag
 
 ``` python
 # Build the command with JSON config (put config.json wherever you want)
@@ -161,21 +208,12 @@ sfq_cmd = "--userscript {} -c {}".format(sfq_script_path, sfq_conf_path)
 
 # Assign the alias
 c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
-```
 
-### Keybindings
-
-The obvious next step is setting up the keybindings:
-
-``` python
-# The following are equivalent!
-# We can bind to an alias or directly to the command.
-
-# config.bind('o', "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd))
+# Optional: bind to a key
 config.bind('o', ':sfq')
 ```
 
-Personally, I prefer leaving the default command for `o` key and assign `:sfq` to a special sequence, for `f` (hint links) and something else. [Check my qutebrowser literate configuration](https://github.com/gicrisf/qute-config) for a more extended explanation of command building, keybindings and other tricks. 
+Personally, I prefer leaving the default command for `o` key and assign `:sfq` to a special sequence, for `f` (hint links) and something else. [Check my qutebrowser literate configuration](https://github.com/gicrisf/qute-config) for a more extended explanation of command building, keybindings and other tricks.
 
 Of course, you can be creative and came up with your own solutions: the script just process your input to give you an output, but it's up to you where and when to use it.
 
@@ -184,7 +222,22 @@ I avoid running javascript on my browser for a lot of reasons: security, minimiz
 
 ## How it works
 
-![diagram](how_it_works.png)
+```mermaid
+graph TD
+      subgraph QB[Qutebrowser]
+          CMD[SFQ command]
+      end
+
+      SCRIPT[SFQ userscript]
+      RULES[RULES]
+      FIFO[QUTE FIFO]
+
+      CMD -->|old url| SCRIPT
+      SCRIPT -.->|1.checks| RULES
+      RULES -.->|2.applies| SCRIPT
+      SCRIPT -->|3.new url| FIFO
+      FIFO --> QB
+```
 
 ## Alternative ways
 Before writing this script, I stepped on another userscript that aims at a similar goal, which is [Qutebrowser URL Mutator](https://codeberg.org/mister_monster/qutebrowser-url-mutator); it's thought to be configured via regexes, just like [Firefox "Redirector" extension](https://github.com/einaregilsson/Redirector). If you're used to this kind of workflow or you simply find it attractive, I suggest you to take a look at it.
