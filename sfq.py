@@ -34,6 +34,11 @@ def load_config(config_path):
             RULES.update(json_rules)
 
 def replace(url):
+    # Handle URLs without scheme (e.g., "reddit.com")
+    parsed = urlparse(url)
+    if not parsed.scheme:
+        url = 'https://' + url
+
     out_url = urlparse(url)
     netloc = out_url.netloc
     

@@ -275,11 +275,43 @@ class TestEdgeCases(unittest.TestCase):
 
     def test_url_without_scheme(self):
         """Test URL without http:// or https:// scheme."""
-        # urlparse should handle this, but test to be sure
+        # Should automatically add https:// and apply rules
         url = "test.com/page"
         result = replace(url)
-        # Should not match because netloc will be empty
-        self.assertEqual(result, url)
+        # Should match rule and force HTTPS
+        self.assertEqual(result, "https://test.com/page")
+
+    def test_url_without_scheme_simple_domain(self):
+        """Test simple domain without scheme (e.g., typing 'reddit.com')."""
+        RULES.clear()
+        RULES.update({
+            'reddit.com': {
+                'out': 'old.reddit.com',
+                'force_https': True
+            }
+        })
+
+        url = "reddit.com"
+        result = replace(url)
+
+        # Should add https:// and apply transformation
+        self.assertEqual(result, "https://old.reddit.com")
+
+    def test_url_without_scheme_with_path(self):
+        """Test domain with path but no scheme."""
+        RULES.clear()
+        RULES.update({
+            'example.com': {
+                'out': 'newexample.com',
+                'clean_queries': True
+            }
+        })
+
+        url = "example.com/path/to/page?tracking=123"
+        result = replace(url)
+
+        # Should add https:// and apply rules
+        self.assertEqual(result, "https://newexample.com/path/to/page")
 
     def test_rule_with_only_one_option(self):
         """Test rule with only one transformation enabled."""
