@@ -28,16 +28,23 @@ Therefore, something like "https://www.reddit.com/r/emacs/comments/yubhff/zwitte
 
 # Installation and usage
 
-Copy the script under your userscript directory:
+## Quick Install
+
+Use the installation script:
 
 ``` sh
-git clone --depth 1 https://github.com/gicrisf/swapforqute ~/.config/qutebrowser/userscripts/swapforqute
+curl -fsSL https://raw.githubusercontent.com/gicrisf/swapforqute/main/install.sh | bash
 ```
 
-Give it the permissions to work on your system:
+Or install manually:
 
 ``` sh
-chmod +x ~/.config/qutebrowser/userscripts/swapforqute/sfq.py
+# Download the latest release
+curl -L -o ~/.config/qutebrowser/userscripts/sfq.py \
+  https://github.com/gicrisf/swapforqute/releases/latest/download/sfq.py
+
+# Make it executable
+chmod +x ~/.config/qutebrowser/userscripts/sfq.py
 ```
 
 The script includes built-in example rules that you can customize directly in the script.
@@ -104,8 +111,7 @@ Better writing a simple alias like `:sfq` in `config.py`:
 
 ``` python
 # Build the command (no -c flag needed)
-sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
-sfq_script_path = sfq_base_dir + "sfq.py"
+sfq_script_path = "~/.config/qutebrowser/userscripts/sfq.py"
 sfq_cmd = "--userscript {}".format(sfq_script_path)
 
 # Assign the alias
@@ -116,9 +122,8 @@ c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
 
 ``` python
 # Build the command with JSON config (put config.json wherever you want)
-sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
-sfq_script_path = sfq_base_dir + "sfq.py"
-sfq_conf_path = sfq_base_dir + "config.json"  # Or any path you prefer
+sfq_script_path = "~/.config/qutebrowser/userscripts/sfq.py"
+sfq_conf_path = "~/.config/qutebrowser/config.json"  # Or any path you prefer
 sfq_cmd = "--userscript {} -c {}".format(sfq_script_path, sfq_conf_path)
 
 # Assign the alias
