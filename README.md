@@ -139,8 +139,14 @@ I avoid running javascript on my browser for a lot of reasons: security, minimiz
 Before writing this script, I stepped on another userscript that aims at a similar goal, which is [Qutebrowser URL Mutator](https://codeberg.org/mister_monster/qutebrowser-url-mutator); it's thought to be configured via regexes, just like [Firefox "Redirector" extension](https://github.com/einaregilsson/Redirector). If you're used to this kind of workflow or you simply find it attractive, I suggest you to take a look at it.
 Mutator was of inspiration for SFQ, so thanks for that!
 
-## Requirements  
-This userscript uses Python standard libraries only. Since it runs in [qutebrowser](https://github.com/qutebrowser/qutebrowser), which depends on Python, all requirements are automatically satisfied.  
+## Requirements
+This userscript uses Python standard libraries only. Since it runs in [qutebrowser](https://github.com/qutebrowser/qutebrowser), which depends on Python, all requirements are automatically satisfied.
+
+## Testing
+The project includes a comprehensive test suite. Run tests with:
+```bash
+python -m unittest test_main
+```
 
 ## Support
 Why don't you help me keeping myself awake buying me a coffee?
