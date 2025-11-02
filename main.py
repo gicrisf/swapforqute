@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import argparse
+import json
 from urllib.parse import urlparse
 
 parser = argparse.ArgumentParser(
@@ -9,6 +10,7 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-u', '--url', help='URL that must be checked and maybe changed')
 parser.add_argument('--cmd', help="Write Qutebrowser's command")
+parser.add_argument('-c', '--config', help='Path to JSON configuration file (extends built-in rules)')
 
 # Configuration rules - edit these as needed
 RULES = {
@@ -23,6 +25,13 @@ RULES = {
         'clean_queries': True
     }
 }
+
+def load_config(config_path):
+    """Load JSON configuration and extend RULES dictionary."""
+    if config_path and os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            json_rules = json.load(f)
+            RULES.update(json_rules)
 
 def replace(url):
     out_url = urlparse(url)
@@ -52,5 +61,9 @@ def replace(url):
 
 if __name__ == "__main__":
     args = parser.parse_args()
+
+    # Load JSON config if provided (extends built-in RULES)
+    load_config(args.config)
+
     with open(os.environ["QUTE_FIFO"], "a") as o_fifo:
         o_fifo.write("{cmd} {url}\n".format(cmd=args.cmd, url=replace(args.url)))
