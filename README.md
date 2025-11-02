@@ -6,20 +6,20 @@ SwapForQute (or just SFQ) is an userscript for qutebrowser that replaces your UR
 
 ![diagram](what_it_does.png)
 
-The diagram up here show, as an example, what would happen with this JSON snippet:
+The diagram up here show, as an example, what would happen with this configuration in the RULES dictionary:
 
-```json
-{
-  "www.reddit.com": {
-    "out": "old.reddit.com",
-    "force_https": true,
-    "clean_queries": true
-  },
-  "reddit.com": {
-    "out": "old.reddit.com",
-    "force_https": true,
-    "clean_queries": true
-  }
+```python
+RULES = {
+    'www.reddit.com': {
+        'out': 'old.reddit.com',
+        'force_https': True,
+        'clean_queries': True
+    },
+    'reddit.com': {
+        'out': 'old.reddit.com',
+        'force_https': True,
+        'clean_queries': True
+    }
 }
 ```
 
@@ -37,18 +37,18 @@ git clone --depth 1 https://github.com/gicrisf/swapforqute ~/.config/qutebrowser
 Give it the permissions to work on your system:
 
 ``` sh
-chmod +x ~/.config/qutebrowser/userscripts/swapforqute/main.py
+chmod +x ~/.config/qutebrowser/userscripts/swapforqute/sfq.py
 ```
 
-The script includes built-in example rules that you can customize. Optionally, you can extend these rules with a JSON configuration file.
+The script includes built-in example rules that you can customize directly in the script.
 
 ## Configuration
 
 SwapForQute supports two configuration approaches:
 
-### 1. Built-in Rules (Recommended for Quick Start)
+### 1. Built-in Rules (Recommended)
 
-Edit the `RULES` dictionary directly in `main.py` (lines 16-27). This is the simplest approach and requires no additional command-line arguments:
+Edit the `RULES` dictionary directly in `sfq.py` (lines 16-27). This is the simplest approach and requires no additional command-line arguments:
 
 ``` python
 RULES = {
@@ -61,12 +61,25 @@ RULES = {
 }
 ```
 
-### 2. JSON Configuration (Optional Extension)
+### 2. JSON Configuration (Optional)
 
-You can extend the built-in rules with a JSON configuration file using the `-c` flag:
+For users who prefer keeping configuration separate, you can create a JSON config file anywhere and use the `-c` flag to extend the built-in rules.
 
-``` sh
-vi ~/.config/qutebrowser/userscripts/swapforqute/config.json
+Create a JSON file with your custom rules:
+
+``` json
+{
+  "www.reddit.com": {
+    "out": "old.reddit.com",
+    "force_https": true,
+    "clean_queries": true
+  },
+  "reddit.com": {
+    "out": "old.reddit.com",
+    "force_https": true,
+    "clean_queries": true
+  }
+}
 ```
 
 When you provide a JSON config file, it **extends** (not replaces) the built-in rules. If a domain appears in both, the JSON rule takes precedence.
@@ -92,7 +105,7 @@ Better writing a simple alias like `:sfq` in `config.py`:
 ``` python
 # Build the command (no -c flag needed)
 sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
-sfq_script_path = sfq_base_dir + "main.py"
+sfq_script_path = sfq_base_dir + "sfq.py"
 sfq_cmd = "--userscript {}".format(sfq_script_path)
 
 # Assign the alias
@@ -102,10 +115,10 @@ c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
 ### Using Built-in Rules + JSON Extension
 
 ``` python
-# Build the command with JSON config
+# Build the command with JSON config (put config.json wherever you want)
 sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
-sfq_script_path = sfq_base_dir + "main.py"
-sfq_conf_path = sfq_base_dir + "config.json"
+sfq_script_path = sfq_base_dir + "sfq.py"
+sfq_conf_path = sfq_base_dir + "config.json"  # Or any path you prefer
 sfq_cmd = "--userscript {} -c {}".format(sfq_script_path, sfq_conf_path)
 
 # Assign the alias
@@ -145,7 +158,7 @@ This userscript uses Python standard libraries only. Since it runs in [qutebrows
 ## Testing
 The project includes a comprehensive test suite. Run tests with:
 ```bash
-python -m unittest test_main
+python -m unittest test_sfq
 ```
 
 ## Support

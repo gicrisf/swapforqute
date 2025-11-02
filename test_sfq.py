@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Unit tests for swapforqute main module.
+Unit tests for swapforqute sfq module.
 
 Run with:
-    python -m unittest test_main
-    python -m unittest test_main.TestReplace.test_force_https
-    python test_main.py
+    python -m unittest test_sfq
+    python -m unittest test_sfq.TestReplace.test_force_https
+    python test_sfq.py
 """
 import unittest
 import os
 import json
 import tempfile
-from main import replace, load_config, RULES
+from sfq import replace, load_config, RULES
 
 class TestReplace(unittest.TestCase):
     """Test URL replacement functionality."""
