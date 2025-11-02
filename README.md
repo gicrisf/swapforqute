@@ -27,6 +27,7 @@ When you bounce on a `www.reddit.com` or `reddit.com` URL, the script automatica
 Therefore, something like "https://www.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs/?utm_source=share&utm_medium=web2x&context=3" magically become "https://old.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs".
 
 # Installation and usage
+
 Copy the script under your userscript directory:
 
 ``` sh
@@ -39,17 +40,44 @@ Give it the permissions to work on your system:
 chmod +x ~/.config/qutebrowser/userscripts/swapforqute/main.py
 ```
 
-In the end, you should edit the configuration as you please:
+The script includes built-in example rules that you can customize. Optionally, you can extend these rules with a JSON configuration file.
+
+## Configuration
+
+SwapForQute supports two configuration approaches:
+
+### 1. Built-in Rules (Recommended for Quick Start)
+
+Edit the `RULES` dictionary directly in `main.py` (lines 16-27). This is the simplest approach and requires no additional command-line arguments:
+
+``` python
+RULES = {
+    'example.com': {
+        'force_https': True,
+        'out': 'newexample.com',
+        'clean_queries': True,
+        'clean_fragments': True
+    }
+}
+```
+
+### 2. JSON Configuration (Optional Extension)
+
+You can extend the built-in rules with a JSON configuration file using the `-c` flag:
 
 ``` sh
 vi ~/.config/qutebrowser/userscripts/swapforqute/config.json
 ```
 
-For each item, you can set how/if:
-- Replace netloc (with what? Set `out`)
-- Force HTTPS (yes/no? Set `force_https`)
-- Delete queries (yes/no? Set `clean_queries`)
-- Delete fragments (yes/no? Set `clean_fragments`)
+When you provide a JSON config file, it **extends** (not replaces) the built-in rules. If a domain appears in both, the JSON rule takes precedence.
+
+### Rule Options
+
+For each domain, you can set:
+- `out`: Replace the domain with this value
+- `force_https`: Force HTTPS scheme (true/false)
+- `clean_queries`: Delete all query parameters (true/false)
+- `clean_fragments`: Delete URL fragments (true/false)
 
 Every element is optional. You can choose to force https requests without touching the other components of the URL or cleaning the fragments without touching the queries.
 
@@ -59,8 +87,22 @@ It's all ready! Set the aliases/keybindings and you're good to go.
 It's not feasible to write all the command's clutter everytime.
 Better writing a simple alias like `:sfq` in `config.py`:
 
+### Using Built-in Rules Only
+
 ``` python
-# Build the command
+# Build the command (no -c flag needed)
+sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
+sfq_script_path = sfq_base_dir + "main.py"
+sfq_cmd = "--userscript {}".format(sfq_script_path)
+
+# Assign the alias
+c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
+```
+
+### Using Built-in Rules + JSON Extension
+
+``` python
+# Build the command with JSON config
 sfq_base_dir = "~/.config/qutebrowser/userscripts/swapforqute/"
 sfq_script_path = sfq_base_dir + "main.py"
 sfq_conf_path = sfq_base_dir + "config.json"
@@ -70,7 +112,9 @@ sfq_cmd = "--userscript {} -c {}".format(sfq_script_path, sfq_conf_path)
 c.aliases['sfq'] = "set-cmd-text -s :spawn {} --cmd 'open' -u ".format(sfq_cmd)
 ```
 
-The obvious next step is setting up the keybindings.
+### Keybindings
+
+The obvious next step is setting up the keybindings:
 
 ``` python
 # The following are equivalent!
