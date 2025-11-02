@@ -1,0 +1,8 @@
+# Ensure shell scripts always use LF line endings
+*.sh text eol=lf
+
+# Let Git handle line endings for text files
+* text=auto
+
+# PowerShell scripts use CRLF on Windows
+*.ps1 text eol=crlf

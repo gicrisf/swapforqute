@@ -26,9 +26,9 @@ RULES = {
 When you bounce on a `www.reddit.com` or `reddit.com` URL, the script automatically tells the browser to search for the corresponding `old.reddit.com` one. As you can see, you can force HTTPS and clean queries, so that all tracking garbage is wiped out in the process.
 Therefore, something like "https://www.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs/?utm_source=share&utm_medium=web2x&context=3" magically become "https://old.reddit.com/r/emacs/comments/yubhff/zwitterionic_digressions_get_user_inputs_in_emacs".
 
-# Installation and usage
+# Quickstart
 
-## Quick Install
+## Linux / macOS
 
 Use the installation script:
 
@@ -36,9 +36,24 @@ Use the installation script:
 curl -fsSL https://raw.githubusercontent.com/gicrisf/swapforqute/main/install.sh | bash
 ```
 
-Or install manually:
+## Windows
+
+Use the PowerShell installation script:
+
+``` powershell
+irm https://raw.githubusercontent.com/gicrisf/swapforqute/main/install.ps1 | iex
+```
+
+# Manual Installation
+
+If you prefer to install manually or want more control over the process:
+
+## Linux / macOS
 
 ``` sh
+# Create the userscripts directory if it doesn't exist
+mkdir -p ~/.config/qutebrowser/userscripts
+
 # Download the latest release
 curl -L -o ~/.config/qutebrowser/userscripts/sfq.py \
   https://github.com/gicrisf/swapforqute/releases/latest/download/sfq.py
@@ -47,7 +62,25 @@ curl -L -o ~/.config/qutebrowser/userscripts/sfq.py \
 chmod +x ~/.config/qutebrowser/userscripts/sfq.py
 ```
 
-The script includes built-in example rules that you can customize directly in the script.
+## Windows
+
+``` powershell
+# Create the userscripts directory if it doesn't exist
+$InstallDir = "$env:APPDATA\qutebrowser\userscripts"
+New-Item -ItemType Directory -Force -Path $InstallDir
+
+# Download the latest release
+Invoke-WebRequest -Uri "https://github.com/gicrisf/swapforqute/releases/latest/download/sfq.py" `
+  -OutFile "$InstallDir\sfq.py"
+
+# Create batch wrapper (required for Windows)
+$BatchContent = @"
+@echo off
+set "SCRIPT_DIR=%~dp0"
+python "%SCRIPT_DIR%sfq.py" %*
+"@
+Set-Content -Path "$InstallDir\sfq.bat" -Value $BatchContent
+```
 
 ## Configuration
 
