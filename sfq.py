@@ -2,6 +2,7 @@
 import os
 import argparse
 import json
+import re
 from urllib.parse import urlparse
 
 parser = argparse.ArgumentParser(
@@ -14,13 +15,33 @@ parser.add_argument('-c', '--config', help='Path to JSON configuration file (ext
 
 # Configuration rules - edit these as needed
 RULES = {
+    # Exact-domain example with all transformations enabled.
+    # "http://example.com/page?utm=1#top" -> "https://mirror-example.com/page"
     'example.com': {
         'force_https': True,
-        'out': 'newexample.com',
+        'out': 'mirror-example.com',
         'clean_queries': True,
         'clean_fragments': True
     },
-    'oldsite.org': {
+    # Exact-domain example without domain replacement.
+    # "http://example.com/page?x=1#anchor" -> "https://example.com/page#anchor"
+    'example.org': {
+        'force_https': True,
+        'clean_queries': True
+    },
+    # Simple wildcard example
+    # "http://alpha.example.com/path?utm=1"
+    # -> "https://alpha.mirror-example.com/path"
+    '*.example.invalid': {
+        'out': '$1.mirror-example.invalid',
+        'force_https': True,
+        'clean_queries': True
+    },
+    # Multiple wildcards example
+    # "http://alpha.beta.example.com/path?utm=1"
+    # -> "https://beta-alpha.mirror-example.com/path"
+    '*.*.example.com': {
+        'out': '$2-$1.mirror-example.com',
         'force_https': True,
         'clean_queries': True
     }
@@ -40,28 +61,56 @@ def replace(url):
         url = 'https://' + url
 
     out_url = urlparse(url)
-    netloc = out_url.netloc
-    
+    host = out_url.hostname.lower() if out_url.hostname else out_url.netloc.lower()
+    instruct = None
+    star_parts = []
+
+    # Prefer exact domain matches first to preserve existing behavior.
+    if host in RULES:
+        instruct = RULES[host]
+    else:
+        # Fall back to '*' wildcard patterns, most specific (most dots) first.
+        wildcard_patterns = sorted(
+            ((p, r) for p, r in RULES.items() if '*' in p.lower()),
+            key=lambda pr: pr[0].count('.'),
+            reverse=True
+        )
+        for pattern, candidate in wildcard_patterns:
+            pattern_l = pattern.lower()
+            # '*' matches any characters including '.', so *.example.com
+            # matches both sub.example.com and a.b.sub.example.com.
+            capture_re = re.escape(pattern_l).replace(r'\*', '(.*?)')
+            match = re.fullmatch(capture_re, host)
+            if not match:
+                continue
+
+            instruct = candidate
+            star_parts = list(match.groups())
+            break
+
     # Apply rules if domain matches
-    if netloc in RULES:
-        instruct = RULES[netloc]
-        
+    if instruct:
         # Force HTTPS
         if instruct.get('force_https', False):
             out_url = out_url._replace(scheme='https')
-            
-        # Replace domain
+
+        # Replace domain. Any port in the original URL is intentionally dropped:
+        # it belongs to the source server, not the target. To keep a port,
+        # include it explicitly in 'out' (e.g. "mirror.example.com:8080").
         if 'out' in instruct:
-            out_url = out_url._replace(netloc=instruct['out'])
-            
+            target = instruct['out']
+            for idx, value in enumerate(star_parts, start=1):
+                target = target.replace('$' + str(idx), value)
+            out_url = out_url._replace(netloc=target)
+
         # Clean queries
         if instruct.get('clean_queries', False):
             out_url = out_url._replace(query='')
-            
+
         # Clean fragments
         if instruct.get('clean_fragments', False):
             out_url = out_url._replace(fragment='')
-    
+
     return out_url.geturl()
 
 if __name__ == "__main__":

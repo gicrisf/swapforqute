@@ -334,5 +334,114 @@ class TestEdgeCases(unittest.TestCase):
         # Should return unchanged (no transformations)
         self.assertEqual(result, url)
 
+
+class TestWildcardRules(unittest.TestCase):
+    """Test wildcard host matching and wildcard output replacement."""
+
+    def setUp(self):
+        RULES.clear()
+
+    def test_wildcard_domain_and_output(self):
+        RULES['*.source.example'] = {
+            'out': '$1.target.example',
+            'force_https': True,
+            'clean_queries': True
+        }
+
+        url = "http://sub.source.example/some/path?utm=1"
+        result = replace(url)
+        self.assertEqual(result, "https://sub.target.example/some/path")
+
+    def test_wildcard_keeps_nested_subdomains(self):
+        RULES['*.source.example'] = {
+            'out': '$1.target.example'
+        }
+
+        result = replace("http://alpha.beta.source.example/some/path")
+        self.assertEqual(result, "http://alpha.beta.target.example/some/path")
+
+    def test_exact_rule_takes_precedence_over_wildcard(self):
+        RULES['*.source.example'] = {
+            'out': '$1.target.example'
+        }
+        RULES['sub.source.example'] = {
+            'out': 'specific.example',
+            'force_https': True
+        }
+
+        result = replace("http://sub.source.example/some/path")
+        self.assertEqual(result, "https://specific.example/some/path")
+
+    def test_question_mark_pattern_is_not_supported(self):
+        # Only '*' wildcard patterns are supported; '?' has no special matching behavior.
+        RULES['source?.example'] = {
+            'force_https': True
+        }
+
+        result = replace("http://source1.example/some/path")
+        # No match should occur, so the URL remains unchanged.
+        self.assertEqual(result, "http://source1.example/some/path")
+
+    def test_multi_star_positional_substitution(self):
+        # First '*' captures "alpha", second '*' captures "beta".
+        # out uses $2-$1 to verify capture ordering is left-to-right.
+        RULES['*.*.source.example'] = {
+            'out': '$2-$1.target.example',
+            'force_https': True
+        }
+
+        result = replace("http://alpha.beta.source.example/some/path")
+        self.assertEqual(result, "https://beta-alpha.target.example/some/path")
+
+    def test_single_star_positional_substitution(self):
+        # Single '*' capture should be available as $1.
+        RULES['*.source.example'] = {
+            'out': '$1.target.example'
+        }
+
+        result = replace("http://sub.source.example/some/path")
+        self.assertEqual(result, "http://sub.target.example/some/path")
+
+    def test_specificity_ordering(self):
+        # *.*.source.example has more dots than *.source.example, so it should
+        # take priority when both patterns match the same host.
+        RULES['*.source.example'] = {
+            'out': '$1.wrong.example'
+        }
+        RULES['*.*.source.example'] = {
+            'out': '$1-$2.target.example'
+        }
+
+        result = replace("http://alpha.beta.source.example/some/path")
+        self.assertEqual(result, "http://alpha-beta.target.example/some/path")
+
+    def test_port_dropped_when_out_is_used(self):
+        # When 'out' triggers a domain replacement, the original port is dropped.
+        RULES['*.source.example'] = {
+            'out': '$1.target.example'
+        }
+
+        result = replace("http://sub.source.example:8080/some/path")
+        self.assertEqual(result, "http://sub.target.example/some/path")
+
+    def test_port_preserved_without_out(self):
+        # When 'out' is absent (e.g. force_https only), the port is preserved.
+        RULES['*.source.example'] = {
+            'force_https': True
+        }
+
+        result = replace("http://sub.source.example:8080/some/path")
+        self.assertEqual(result, "https://sub.source.example:8080/some/path")
+
+    def test_case_insensitive_matching(self):
+        # Host matching is case-insensitive.
+        RULES['*.source.example'] = {
+            'out': '$1.target.example',
+            'force_https': True
+        }
+
+        result = replace("http://SUB.SOURCE.EXAMPLE/some/path")
+        self.assertEqual(result, "https://sub.target.example/some/path")
+
 if __name__ == '__main__':
     unittest.main()
