@@ -2,11 +2,11 @@
 set -e
 
 # SwapForQute Installation Script
-# Downloads the latest release and sets up the userscript
+# Downloads the latest script from the default branch and sets up the userscript
 
 INSTALL_DIR="${HOME}/.config/qutebrowser/userscripts"
 SCRIPT_NAME="sfq.py"
-RELEASE_URL="https://github.com/gicrisf/swapforqute/releases/latest/download/${SCRIPT_NAME}"
+SCRIPT_URL="https://raw.githubusercontent.com/gicrisf/swapforqute/main/${SCRIPT_NAME}"
 
 echo "SwapForQute Installation"
 echo "========================"
@@ -27,9 +27,9 @@ echo "Creating installation directory: ${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"
 
 # Download the script
-echo "Downloading latest release..."
+echo "Downloading latest script..."
 cd "${INSTALL_DIR}"
-${DOWNLOAD_CMD} "${SCRIPT_NAME}" "${RELEASE_URL}"
+${DOWNLOAD_CMD} "${SCRIPT_NAME}" "${SCRIPT_URL}"
 
 # Make executable
 echo "Making script executable..."

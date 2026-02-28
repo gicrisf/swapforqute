@@ -1,11 +1,11 @@
 # SwapForQute Installation Script for Windows
-# Downloads the latest release and sets up the userscript
+# Downloads the latest script from the default branch and sets up the userscript
 
 $ErrorActionPreference = "Stop"
 
 $InstallDir = "$env:APPDATA\qutebrowser\userscripts"
 $ScriptName = "sfq.py"
-$ReleaseUrl = "https://github.com/gicrisf/swapforqute/releases/latest/download/$ScriptName"
+$ScriptUrl = "https://raw.githubusercontent.com/gicrisf/swapforqute/main/$ScriptName"
 
 Write-Host "SwapForQute Installation" -ForegroundColor Cyan
 Write-Host "========================" -ForegroundColor Cyan
@@ -22,10 +22,10 @@ Write-Host "Creating installation directory: $InstallDir"
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 
 # Download the script
-Write-Host "Downloading latest release..."
+Write-Host "Downloading latest script..."
 $OutputPath = Join-Path $InstallDir $ScriptName
 try {
-    Invoke-WebRequest -Uri $ReleaseUrl -OutFile $OutputPath
+    Invoke-WebRequest -Uri $ScriptUrl -OutFile $OutputPath
     Write-Host "Download complete!" -ForegroundColor Green
 } catch {
     Write-Host "Error: Failed to download the script." -ForegroundColor Red
