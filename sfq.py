@@ -49,6 +49,11 @@ RULES = {
 
 def load_config(config_path):
     """Load JSON configuration and extend RULES dictionary."""
+    global RULES
+    if 'RULES' not in globals():
+        RULES = {}
+    if config_path:
+        config_path = os.path.expanduser(config_path)
     if config_path and os.path.exists(config_path):
         with open(config_path, 'r') as f:
             json_rules = json.load(f)

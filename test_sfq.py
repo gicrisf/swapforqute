@@ -193,6 +193,28 @@ class TestConfigLoading(unittest.TestCase):
         # Built-in rules should remain intact
         self.assertIn('example.com', RULES)
 
+    def test_tilde_path_expansion(self):
+        """Test that ~ in config path is expanded and the file is actually loaded."""
+        config_data = {
+            "tilde-test.com": {
+                "out": "expanded.com",
+                "force_https": True
+            }
+        }
+
+        home = os.path.expanduser('~')
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', dir=home, delete=False) as f:
+            json.dump(config_data, f)
+            temp_path = f.name
+
+        tilde_path = '~/' + os.path.basename(temp_path)
+
+        try:
+            load_config(tilde_path)
+            self.assertIn('tilde-test.com', RULES, "Rules not loaded.")
+        finally:
+            os.unlink(temp_path)
+
 
 class TestIntegration(unittest.TestCase):
     """Integration tests combining config loading and URL replacement."""
